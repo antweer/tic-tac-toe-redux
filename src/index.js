@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import {click} from './actions.js';
+import {connect}, {Provider} from 'react-redux';
+import store from './store.js';
 
 function Square(props) {
   return (
@@ -11,10 +14,10 @@ function Square(props) {
 }
 
 class Board extends React.Component {
-  
+
   renderSquare(i) {
     return (
-      <Square 
+      <Square
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
       />
@@ -54,12 +57,12 @@ class Game extends React.Component {
       xIsNext: true,
     };
   }
-  
+
   handleClick(i){
     const history = this.state.history;
     const current = history[history.length - 1];
     const squares = current.squares.slice();
-    
+
     if (calculateWinner(squares) || squares[i]){
       return;
     }
@@ -71,32 +74,51 @@ class Game extends React.Component {
       xIsNext: !this.state.xIsNext,
     });
   }
-  
+
   render() {
     const history = this.state.history;
     const current = history[history.length - 1];
     const winner = calculateWinner(current.squares);
-    
+
     let status;
     if (winner) {
       status = 'Winner: ' + winner;
     } else {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
     }
-    
+
     return (
-      <div className="game">
-        <div className="game-board">
-          <Board squares={current.squares} onClick={(i) => this.handleClick(i)}/>
+      <Provider store={store}>
+        <div className="game">
+          <div className="game-board">
+            <Board squares={current.squares} onClick={(i) => this.handleClick(i)}/>
+          </div>
+          <div className="game-info">
+            <div>{status}</div>
+            <ol>{/* TODO */}</ol>
+          </div>
         </div>
-        <div className="game-info">
-          <div>{status}</div>
-          <ol>{/* TODO */}</ol>
-        </div>
-      </div>
+      </Provider>
     );
   }
 }
+
+function mapStateToProps (state) {
+  return {
+    contacts: state
+  }
+}
+function mapDispatchToProps (dispatch) {
+  return {
+    onSubmit: function (id, data) {
+      dispatch(addContact(id, data))
+    }
+  }
+}
+
+Game = connect(
+  mapStateToProps, mapDispatchToProps
+)(Game)
 
 function calculateWinner(squares) {
   const lines = [
