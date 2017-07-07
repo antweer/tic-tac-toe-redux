@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import {click} from './actions.js';
-import {connect}, {Provider} from 'react-redux';
+import {connect, Provider} from 'react-redux';
 import store from './store.js';
 
 function Square(props) {
@@ -48,8 +48,8 @@ class Board extends React.Component {
 }
 
 class Game extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       history: [{
         squares: Array(9).fill(null),
@@ -88,17 +88,15 @@ class Game extends React.Component {
     }
 
     return (
-      <Provider store={store}>
-        <div className="game">
-          <div className="game-board">
-            <Board squares={current.squares} onClick={(i) => this.handleClick(i)}/>
-          </div>
-          <div className="game-info">
-            <div>{status}</div>
-            <ol>{/* TODO */}</ol>
-          </div>
+      <div className="game">
+        <div className="game-board">
+          <Board squares={current.squares} onClick={(i) => this.handleClick(i)}/>
         </div>
-      </Provider>
+        <div className="game-info">
+          <div>{status}</div>
+          <ol>{/* TODO */}</ol>
+        </div>
+      </div>
     );
   }
 }
@@ -111,7 +109,7 @@ function mapStateToProps (state) {
 function mapDispatchToProps (dispatch) {
   return {
     onSubmit: function (id, data) {
-      dispatch(addContact(id, data))
+      dispatch(click(id, data))
     }
   }
 }
@@ -142,6 +140,8 @@ function calculateWinner(squares) {
 // ========================================
 
 ReactDOM.render(
-  <Game />,
+  <Provider store={store}>
+    <Game />
+  </Provider>,
   document.getElementById('root')
 );
